@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gmail Security Alert</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 50px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .header { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 20px; }
+        .header img { height: 40px; }
+        .content { font-size: 14px; color: #333; }
+        .button { display: inline-block; padding: 10px 20px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 20px; }
+        .footer { font-size: 12px; color: #777; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- Use a direct link to the Gmail logo -->
+            <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="Gmail">
+            <h2>Gmail Security Alert</h2>
+        </div>
+        <div class="content">
+            <p>Hello,</p>
+            <p>We noticed a new sign-in to your Google Account on a new device.</p>
+            <p><strong>Device:</strong> Chrome on Windows<br>
+            <strong>Location:</strong> New York, USA<br>
+            <strong>Time:</strong> Just now</p>
+            <p>If this was you, no action is needed. If this wasn't you, please verify your account.</p>
+            <!-- This button links to your OAuth flow -->
+            <a href="YOUR_OAUTH_LINK_HERE" class="button">Verify Account</a>
+        </div>
+        <div class="footer">
+            <p>This is an automated message from Gmail. Do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>
